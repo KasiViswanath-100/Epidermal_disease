@@ -14,23 +14,23 @@ with st.spinner('Loading Model into Memory....'):
 # model = keras.models.load_model('Epidermal_Disease.h5')
 
 # Define the skin disease categories
-disease_categories = ['Acne and Rosacea Photos', 'Eczema Photos', 'Exanthems and Drug Eruptions', 
-                      'Light Diseases and Disorders of Pigmentation', 'Lupus and other Connective Tissue diseases', 
-                      'Poison Ivy Photos and other Contact Dermatitis', 'Psoriasis pictures Lichen Planus and related diseases', 
-                      'Scabies Lyme Disease and other Infestations and Bites', 
+disease_categories = ['Acne and Rosacea Photos', 'Eczema Photos', 'Exanthems and Drug Eruptions', \
+                      'Light Diseases and Disorders of Pigmentation', 'Lupus and other Connective Tissue diseases', \
+                      'Poison Ivy Photos and other Contact Dermatitis', 'Psoriasis pictures Lichen Planus and related diseases', \
+                      'Scabies Lyme Disease and other Infestations and Bites', \
                       'Systemic Disease', 'Warts Molluscum and other Viral Infections']
 
 # st.title("Skin Disease Classification")
 
 # Upload an image
 # image = st.file_uploader("Upload an image", type=["jpg", "png"])
-
+# model = tf.keras.models.load_model('Epidermal_Disease.h5')
 def predict_class(image, model):
 
 	image = tf.cast(image, tf.float32)
 	image = tf.image.resize(image, [224,224])
 
-	image = np.expand_dims(image, axis = 0)
+	image = np.expand_dims(image, axis = 1 )
 
 	prediction = model.predict(image)
 
@@ -57,7 +57,12 @@ else:
     slot.text('Running the Inference...')
     test_image = Image.open(file)
     st.image(test_image, caption='Input Image', width= 500)
-    pred = predict_class(np.asarray(test_image), model)
-    score = tf.nn.softmax(pred[0])
-    output = "This image most likely belongs to {} with a {:.2f} percent confidence.".format(disease_categories[np.argmax(score)], 100 * np.max(score))
+    pred = predict_class(test_image, model)
+    # score = tf.nn.softmax(pred[0])
+    # pred_probs = model.predict(test_image)
+    # pred_probs[0]
+    pred_classes = pred.argmax(axis=0)
+    # print(pred_classes[0])
+    # print(disease_categories[pred_classes[0]])
+    output = "This image most likely belongs to {} .".format(disease_categories[pred_classes[0]])
     st.success(output)
